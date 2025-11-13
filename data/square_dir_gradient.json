@@ -1,5 +1,5 @@
 {
-    "nozzle_width": 0.4,
+    "nozzle_width": 2.0,
     "svg_path":             "data/svg/square_70.svg",
     "line_field_path":      "data/png/gradient_line.png",
     "line_mode_field_path": "data/png/constrained_mode.png",

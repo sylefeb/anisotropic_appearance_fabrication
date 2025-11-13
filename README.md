@@ -152,7 +152,7 @@ Four types of orientation can be prescribed with a direction mode map:
 - **Parallel to the border** (red areas in the previous figure),
 - **orthogonal to the border** (blue areas in the previous figure),
 - **smoothest** (yellow areas in the previous figure), or
-- **constrained** (color gradient areas in the previous figure). 
+- **constrained** (color gradient areas in the previous figure).
 
 These four modes are represented with a PNG grayscale image (8 bits per pixel), whose pixel value is mapped to one of the four modes. Examples of direction mode maps are located in [data/png](data/png), and a detailed description of this input can be found in the [parameter description](data/README.md#input-description) (see `line_mode_field_path` parameter).
 
