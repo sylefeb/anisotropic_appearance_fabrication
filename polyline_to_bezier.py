@@ -153,14 +153,19 @@ def polyline_to_cubic_spline(points, smoothing=0.0, num_points=50):
     plt.plot(x_new, y_new, 'g')
     return list(zip(x_new, y_new))
 
-def polyline_to_tck_cubic_spline(points, smoothing, cyclic):
+def polyline_to_tck_cubic_spline(points, smoothing, cyclic, extremity_len=4, extremity_w=0.1):
     """
     Approximate a polyline with a cubic spline.
     Returns a list of (x, y) points.
     """
     points = remove_duplicates(points)
     x, y = zip(*points)
-    tck, u = splprep([x, y], s=smoothing, per=False) ## NOTE: no need for cyclic as first and last point match
+    weights = np.full(len(points),1.0)
+    if len(points) > 2*extremity_len and not cyclic:
+        for i in range(0,4):
+            weights[i]=extremity_w
+            weights[-1-i]=extremity_w
+    tck, u = splprep([x, y], s=smoothing, w=weights, per=False) ## NOTE: no need for cyclic as first and last point match
     # print(tck[0])
     return tck
   
@@ -172,12 +177,14 @@ if __name__ == "__main__":
     parser.add_argument('-i','--input',help='Input SVG with polylines', required=True)
     parser.add_argument('-o','--output',help='Output SVG with polylines', required=True)
     parser.add_argument('-s','--smoothing', type=float, help='Smoothing, lower is more accurate but produces more control points', required=True)
+    parser.add_argument('-l','--extremity_len', type=int, help='Length of extremity for open paths', required=False, default=4)
+    parser.add_argument('-w','--extremity_w', type=float, help='Weight of extremity for open paths (lower means straighter)', required=False, default=0.1)
     args = vars(parser.parse_args())
     print(args)
     # Load polylines from SVG
     polylines = load_svg_polylines(args['input'])
     print("input: ",len(polylines))
-       
+
     # To display the result (debug)
     # all_splines = [polyline_to_cubic_spline(poly, smoothing=1.0, num_points=50) for poly in polylines]
     # plt.show()
@@ -187,7 +194,7 @@ if __name__ == "__main__":
         poly = polylines[i]
         # print(poly)
         if len(poly) > 3:
-            tck = polyline_to_tck_cubic_spline(poly, smoothing=args['smoothing'], cyclic=(poly[0] == poly[-1]))
+            tck = polyline_to_tck_cubic_spline(poly, smoothing=args['smoothing'], cyclic=(poly[0] == poly[-1]),extremity_len=args['extremity_len'],extremity_w=args['extremity_w'])
             paths.append(bspline_to_svg_path(tck,cyclic=(poly[0] == poly[-1])))
         else:
             paths.append(polyline_to_svg_path(poly))
